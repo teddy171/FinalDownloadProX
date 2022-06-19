@@ -1,0 +1,14 @@
+.DS_Store
+Dockerfile
+
+__pycache__/
+ytdx_env/
+data/
+
+dump.rdb
+
+*.sqlite
+*.sqlite3
+*.log
+*.pid
+*.sock

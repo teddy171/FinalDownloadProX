@@ -1,0 +1,22 @@
+{% extends "YoutubeDownloader/base.html" %}
+
+
+{% block content %}
+    <p>YoutubeDownloader X can help you donwload video on youtube. <br>
+        If in your country cannot visit youtube, you can use our search function.</p>
+    <p>
+        You can input the url of video or the keyword below. Than we can help you to download video.<br>
+        <strong>ENJOY YOURSELF</strong>
+    </p>
+    <form action="{% url 'YoutubeDownloader:new_task' %}" method='post'>
+        <div class="Wrapper">
+            <div class="Input">
+                {% csrf_token %}
+                <input type="text" id="input" name="content" class="Input-text" placeholder="url or keyword">
+                <label for="input" class="Input-label">video url or keyword</label>
+            </div>
+            <button name="submit">search or download</button>
+        </div>
+    </form>
+
+{% endblock content %}
