@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <li>{{ title }}</li>
+    <li>{{ description }}</li>
+    <li>{{ url }}</li>
+    <input type="radio" name="i_button" id="add" />
+    <div class="buttons">
+    <label for="add"></label>
+    </div>
+
+    <p class="which_button"></p>
+{% endblock content %}
