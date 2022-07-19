@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <p><input type="submit" name="whether_donwload" value="Start to download video"></p>
+        <p><input type="submit" name="whether_add" value="Continue to add tasks"></p>
+    </form>
+{% endblock content %}

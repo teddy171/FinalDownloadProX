@@ -1,1 +1,1 @@
-web: nginx -c `pwd`/nginx.conf ; supervisord -c ./supervisord.conf
+web: nginx -c `pwd`/nginx.conf ; supervisord -c ./config/supervisord.conf
