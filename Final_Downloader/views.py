@@ -101,9 +101,9 @@ def breakpoint_download(request, user_path, video_id, filename):
     full_path = f"{os.getcwd()}/{user_path}/{video_id}/{filename}"
     response = HttpResponse()
     response['Content_Type']='application/octet-stream'
-    response["Content-Disposition"] = "attachment; filename={0}".format(filename.encode('utf-8'))
+    response["Content-Disposition"] = f"attachment; filename={filename}"
     response['Content-Length'] = os.path.getsize(full_path)
-    response['X-Accel-Redirect'] = "/files{0}".format(full_path)
+    response['X-Accel-Redirect'] = f"/files{full_path}"
     return response
     
 
