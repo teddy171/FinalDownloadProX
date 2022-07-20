@@ -7,9 +7,7 @@ import json
 import requests
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.utils.http import http_date
-from django.views.static import was_modified_since
-from django.http import Http404, FileResponse, HttpResponseNotModified
+from django.http import Http404, HttpResponse
 from celery.result import AsyncResult
 import youtube_dl
 
@@ -54,52 +52,60 @@ def delete_file(file_name, start_byte):
 
 def breakpoint_download(request, user_path, video_id, filename):
 
-    statobj = os.stat(f"{user_path}/{video_id}/{filename}")
+    # statobj = os.stat(f"{user_path}/{video_id}/{filename}")
  
-    # 判断下载过程中文件是否被修改过
-    if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
-                               statobj.st_mtime, statobj.st_size):
-        return HttpResponseNotModified()
+    # # 判断下载过程中文件是否被修改过
+    # if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
+    #                            statobj.st_mtime, statobj.st_size):
+    #     return HttpResponseNotModified()
  
-    # 获取文件的content_type
-    content_type, encoding = mimetypes.guess_type(f"{user_path}/{video_id}/{filename}")
-    content_type = content_type or 'application/octet-stream'
+    # # 获取文件的content_type
+    # content_type, encoding = mimetypes.guess_type(f"{user_path}/{video_id}/{filename}")
+    # content_type = content_type or 'application/octet-stream'
 
-    # 计算读取文件的起始位置
-    try:
-        start_bytes = request.headers.get('RANGE').strip()
-    except AttributeError:
-        start_bytes = 0
-        with open(f'{user_path}/{video_id}/full_size.json', 'w') as f:
-            json.dump({"full_size": statobj.st_size}, f)
-            full_size = statobj.st_size
-    else:
-        start_bytes = start_bytes.replace('bytes=', '')
-        start_bytes = int(start_bytes.split('-')[0])
-        delete_file(f"{user_path}/{video_id}/{filename}", start_bytes)
-        with open(f'{user_path}/{video_id}/full_size.json') as f:
-            full_size = json.load(f)["full_size"]
-    # 打开文件并移动下标到起始位置，客户端点击继续下载时，从上次断开的点继续读取
-    the_file = open(f"{user_path}/{video_id}/{filename}", 'rb')
+    # # 计算读取文件的起始位置
+    # try:
+    #     start_bytes = request.headers.get('RANGE').strip()
+    # except AttributeError:
+    #     start_bytes = 0
+    #     with open(f'{user_path}/{video_id}/full_size.json', 'w') as f:
+    #         json.dump({"full_size": statobj.st_size}, f)
+    #         full_size = statobj.st_size
+    # else:
+    #     start_bytes = start_bytes.replace('bytes=', '')
+    #     start_bytes = int(start_bytes.split('-')[0])
+    #     delete_file(f"{user_path}/{video_id}/{filename}", start_bytes)
+    #     with open(f'{user_path}/{video_id}/full_size.json') as f:
+    #         full_size = json.load(f)["full_size"]
+    # # 打开文件并移动下标到起始位置，客户端点击继续下载时，从上次断开的点继续读取
+    # the_file = open(f"{user_path}/{video_id}/{filename}", 'rb')
     
-    # status=200表示下载开始，status=206表示下载暂停后继续，为了兼容火狐浏览器而区分两种状态
-    # 关于django的response对象，参考：https://www.cnblogs.com/scolia/p/5635546.html
-    # 关于response的状态码，参考：https://www.cnblogs.com/DeasonGuan/articles/Hanami.html
-    response = FileResponse(the_file, status=206 if start_bytes > 0 else 200, as_attachment=True)
-    # FileResponse默认block_size = 4096，因此迭代器每次读取4KB数据
-    response['Last-Modified'] = http_date(statobj.st_mtime)
+    # # status=200表示下载开始，status=206表示下载暂停后继续，为了兼容火狐浏览器而区分两种状态
+    # # 关于django的response对象，参考：https://www.cnblogs.com/scolia/p/5635546.html
+    # # 关于response的状态码，参考：https://www.cnblogs.com/DeasonGuan/articles/Hanami.html
+    # response = FileResponse(the_file, status=206 if start_bytes > 0 else 200, as_attachment=True)
+    # # FileResponse默认block_size = 4096，因此迭代器每次读取4KB数据
+    # response['Last-Modified'] = http_date(statobj.st_mtime)
  
-    response['Content-Length'] = full_size - start_bytes
-    if encoding:
-        response['Content-Encoding'] = encoding
+    # response['Content-Length'] = full_size - start_bytes
+    # if encoding:
+    #     response['Content-Encoding'] = encoding
  
-    # 'Content-Range'的'/'之前描述响应覆盖的文件字节范围，起始下标为0，'/'之后描述整个文件长度，与'HTTP_RANGE'对应使用
-    # 参考：http://liqwei.com/network/protocol/2011/886.shtml
-    response['Content-Range'] = 'bytes %s-%s/%s' % (start_bytes, full_size - 1, full_size)
+    # # 'Content-Range'的'/'之前描述响应覆盖的文件字节范围，起始下标为0，'/'之后描述整个文件长度，与'HTTP_RANGE'对应使用
+    # # 参考：http://liqwei.com/network/protocol/2011/886.shtml
+    # response['Content-Range'] = 'bytes %s-%s/%s' % (start_bytes, full_size - 1, full_size)
  
-    # 'Cache-Control'控制浏览器缓存行为，此处禁止浏览器缓存，参考：https://blog.csdn.net/cominglately/article/details/77685214
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    # # 'Cache-Control'控制浏览器缓存行为，此处禁止浏览器缓存，参考：https://blog.csdn.net/cominglately/article/details/77685214
+    # response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    # return response
+    full_path = f"{os.getcwd()}/{user_path}/{video_id}/{filename}"
+    response = HttpResponse()
+    response['Content_Type']='application/octet-stream'
+    response["Content-Disposition"] = "attachment; filename={0}".format(filename.encode('utf-8'))
+    response['Content-Length'] = os.path.getsize(full_path)
+    response['X-Accel-Redirect'] = "/files{0}".format(full_path)
     return response
+    
 
 def save_form(form, owner):
     if form.is_valid():
