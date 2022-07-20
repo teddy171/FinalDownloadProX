@@ -1,1 +1,1 @@
-web: supervisord -c ./config/supervisord.conf
+web: bin/start-nginx supervisord -c ./config/supervisord.conf
