@@ -36,20 +36,12 @@ http {
   client_body_timeout <%= ENV['NGINX_CLIENT_BODY_TIMEOUT'] || 5 %>;
 
   server {
-    listen <%= ENV["PORT"] %>;
+    listen 80;
     server_name _;
     keepalive_timeout 500;
-    client_max_body_size <%= ENV['NGINX_CLIENT_MAX_BODY_SIZE'] || 1 %>M;
-
-    if ($http_x_forwarded_proto = "http") {
-        return 301 https://$host$request_uri;
-    }
 
     location / {
-        # proxy_pass http://$host:$PORT;
-        # proxy_set_header Host $host;
-        # proxy_set_header X-Real-IP $remote_addr;
-        # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # proxy_pass http://localhost:8000;
         root /app/FinalDownloadProX/runtime.txt;
     }
     location /files/ {
