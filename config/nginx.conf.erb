@@ -41,8 +41,7 @@ http {
     keepalive_timeout 500;
 
     location / {
-        # proxy_pass http://localhost:8000;
-        root /app/FinalDownloadProX/runtime.txt;
+        proxy_pass http://localhost:8000;
     }
     location /files/ {
         internal;
