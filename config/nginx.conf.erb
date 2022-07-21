@@ -41,10 +41,11 @@ http {
     keepalive_timeout 500;
 
     location / {
-        proxy_pass http://localhost:8000;
+        root /;
+        
     }
     location /files/ {
-        root /;
+        proxy_pass http://localhost:8000;
     }
   }
 }
