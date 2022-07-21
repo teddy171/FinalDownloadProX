@@ -1,24 +1,37 @@
-worker_processes 1;
-
-user nobody nogroup;
-# 'user nobody nobody;' for systems with 'nobody' as a group instead
-error_log  /var/log/nginx/error.log warn;
-pid /var/run/nginx.pid;
+daemon off;
+# Heroku dynos have at least 4 cores.
+worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
 
 events {
-  worker_connections 1024; # increase if you have lots of clients
-  accept_mutex off; # set to 'on' if nginx worker_processes > 1
-  # 'use epoll;' to enable for Linux 2.6+
-  # 'use kqueue;' to enable for FreeBSD, OSX
+  use epoll;
+  accept_mutex on;
+  worker_connections <%= ENV['NGINX_WORKER_CONNECTIONS'] || 1024 %>;
 }
 
 http {
-  include mime.types;
-  # fallback in case we can't determine a type
-  default_type application/octet-stream;
-  access_log /var/log/nginx/access.log combined;
-  sendfile on;
+  gzip on;
+  gzip_comp_level 5;
+  gzip_proxied any;
+  gzip_types
+    text/css
+    text/javascript
+    text/xml
+    text/plain
+    application/javascript
+    application/x-javascript
+    application/json
+    image/x-icon;
 
+  server_tokens off;
+
+  log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
+  access_log <%= ENV['NGINX_ACCESS_LOG_PATH'] || 'logs/nginx/access.log' %> l2met;
+  error_log <%= ENV['NGINX_ERROR_LOG_PATH'] || 'logs/nginx/error.log' %>;
+
+  include mime.types;
+  default_type application/octet-stream;
+  sendfile on;
+  
   upstream app_server {
     # fail_timeout=0 means we always retry an upstream even if it failed
     # to return a good HTTP response
@@ -39,8 +52,8 @@ http {
   server {
     # use 'listen 80 deferred;' for Linux
     # use 'listen 80 accept_filter=httpready;' for FreeBSD
-    listen 80;
-    client_max_body_size 4G;
+    listen <%= ENV['PORT'] %>;
+    server_name _;
 
     # set the correct host(s) for your site
     server_name example.com www.example.com;
@@ -64,5 +77,7 @@ http {
       proxy_redirect off;
       proxy_pass http://app_server;
     }
-  }
+    location /files/ {
+      root /;
+    }
 }
