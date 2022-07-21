@@ -1,51 +1,68 @@
-daemon off;
-# Heroku dynos have at least 4 cores.
-worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
+worker_processes 1;
+
+user nobody nogroup;
+# 'user nobody nobody;' for systems with 'nobody' as a group instead
+error_log  /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
 
 events {
-  use epoll;
-  accept_mutex on;
-  worker_connections <%= ENV['NGINX_WORKER_CONNECTIONS'] || 1024 %>;
+  worker_connections 1024; # increase if you have lots of clients
+  accept_mutex off; # set to 'on' if nginx worker_processes > 1
+  # 'use epoll;' to enable for Linux 2.6+
+  # 'use kqueue;' to enable for FreeBSD, OSX
 }
 
 http {
-  gzip on;
-  gzip_comp_level 5;
-  gzip_proxied any;
-  gzip_types
-    text/css
-    text/javascript
-    text/xml
-    text/plain
-    application/javascript
-    application/x-javascript
-    application/json
-    image/x-icon;
-
-  server_tokens off;
-
-  log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
-  access_log <%= ENV['NGINX_ACCESS_LOG_PATH'] || 'logs/nginx/access.log' %> l2met;
-  error_log <%= ENV['NGINX_ERROR_LOG_PATH'] || 'logs/nginx/error.log' %>;
-
   include mime.types;
+  # fallback in case we can't determine a type
   default_type application/octet-stream;
+  access_log /var/log/nginx/access.log combined;
   sendfile on;
 
-  # Must read the body in 5 seconds.
-  client_body_timeout <%= ENV['NGINX_CLIENT_BODY_TIMEOUT'] || 5 %>;
+  upstream app_server {
+    # fail_timeout=0 means we always retry an upstream even if it failed
+    # to return a good HTTP response
+
+    # for UNIX domain socket setups
+    server unix:/tmp/gunicorn.sock fail_timeout=0;
+
+    # for a TCP configuration
+    # server 192.168.0.7:8000 fail_timeout=0;
+  }
 
   server {
-    listen <%= ENV['PORT'] %>;
-    server_name _;
-    keepalive_timeout 500;
+    # if no Host match, close the connection to prevent host spoofing
+    listen 80 default_server;
+    return 444;
+  }
+
+  server {
+    # use 'listen 80 deferred;' for Linux
+    # use 'listen 80 accept_filter=httpready;' for FreeBSD
+    listen 80;
+    client_max_body_size 4G;
+
+    # set the correct host(s) for your site
+    server_name example.com www.example.com;
+
+    keepalive_timeout 5;
+
+    # path for static files
+    root /path/to/app/current/public;
 
     location / {
-      root /;
-        
+      # checks for static file, if not found proxy to app
+      try_files $uri @proxy_to_app;
     }
-    location /files/ {
-      proxy_pass http://localhost:8000;
+
+    location @proxy_to_app {
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header Host $http_host;
+      # we don't want nginx trying to do something clever with
+      # redirects, we set the Host: header above already.
+      proxy_redirect off;
+      proxy_pass http://app_server;
     }
   }
 }
