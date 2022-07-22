@@ -44,24 +44,15 @@ http {
     # use 'listen 80 deferred;' for Linux
     # use 'listen 80 accept_filter=httpready;' for FreeBSD
     listen <%= ENV['PORT'] %>;
-    server_name _;
 
-    keepalive_timeout 5;
+    # download
+    autoindex on;               # enable directory listing output
+    autoindex_exact_size off;   # output file sizes rounded to kilobytes, megabytes, and gigabytes
+    autoindex_localtime on;     # output local times in the directory
 
-    location /files/ {
-      root /;
-    }
     location / {
-      # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      # proxy_set_header X-Forwarded-Proto $scheme;
-      # proxy_set_header Host $http_host;
-      # # we don't want nginx trying to do something clever with
-      # # redirects, we set the Host: header above already.
-      # proxy_redirect off;
-      # proxy_pass http://app_server;
-      
-    }
-
+        root /app;
+    }    
   }
 
 }
