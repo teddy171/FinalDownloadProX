@@ -1,1 +1,1 @@
-web: bin/start-nginx supervisord -c ./config/supervisord.conf
+web: supervisord -c ./config/supervisord.conf; bin/start-nginx-solo
