@@ -145,25 +145,25 @@ def new_task(request):
             try:
                 r = requests.get(content)
             except requests.exceptions.MissingSchema:
-                return redirect("YoutubeDownloader:search_video", key_word=content)
+                return redirect("Fianl_Downloader:search_video", key_word=content)
             else:
-                    same_task = Task.objects.filter(content=content, owner=request.user)
-                    if same_task or not(r.ok):
-                        return redirect('YoutubeDownloader:new_task')
-                    else:
-                        save_form(form, request.user)
-                        return redirect('YoutubeDownloader:download_task')
+                same_task = Task.objects.filter(content=content, owner=request.user)
+                if same_task or not(r.ok):
+                    return redirect('Fianl_Downloader:new_task')
+                else:
+                    save_form(form, request.user)
+                    return redirect('Fianl_Downloader:download_task')
                     
 
     #Display a blank or invalid form.
     context = {'form': form}
-    return render(request, 'YoutubeDownloader/new_task.html', context)
+    return render(request, 'Fianl_Downloader/new_task.html', context)
 
 
 @login_required
 def download_task(request):
     if request.method != 'POST':
-        return render(request, 'YoutubeDownloader/download_video.html')
+        return render(request, 'Fianl_Downloader/download_video.html')
     else:
         whether_donwload = request.POST.get('whether_donwload', None)
         whether_add = request.POST.get('whether_add', None)
@@ -171,7 +171,7 @@ def download_task(request):
             tasks = Task.objects.filter(owner=request.user)
             path = clean_data(request.user)
             if len(tasks) == 0:
-                return redirect('YoutubeDownloader:new_task')
+                return redirect('Fianl_Downloader:new_task')
             task_status = {}
             for task in tasks:
                 origin = set(os.listdir(path))
@@ -189,9 +189,9 @@ def download_task(request):
             with open(f"{path}/work.json", 'w') as f:
                 json.dump(task_status, f)
             tasks.delete()
-            return redirect('YoutubeDownloader:download_status')
+            return redirect('Fianl_Downloader:download_status')
         elif whether_add:
-            return redirect('YoutubeDownloader:new_task')
+            return redirect('Fianl_Downloader:new_task')
 
 @login_required
 def download_status(request):
@@ -229,7 +229,7 @@ def download_status(request):
                 file_size = "{:,}".format(file_size)
                 message[video_id] = {"status": status, "file_name": file_name, "file_curr_size": file_curr_size, "file_size" :file_size}
         message = {"message": message}
-        return render(request, 'YoutubeDownloader/download_status.html', message)
+        return render(request, 'Fianl_Downloader/download_status.html', message)
 
 @login_required
 def transmit_file(request, video_id):
@@ -264,7 +264,7 @@ def search_video(request, key_word):
             info = json.load(f)
             titles[info["id"]] = info["title"]
     content = {"titles": titles}
-    return render(request, 'YoutubeDownloader/search_video.html', content)
+    return render(request, 'Fianl_Downloader/search_video.html', content)
 
 @login_required
 def display_video_info(request, video_id):
@@ -272,5 +272,5 @@ def display_video_info(request, video_id):
     with open(f"{user_path}/search/{video_id}.info.json") as f:
         info = json.load(f)
     content = {"title": info["title"], "description": info["description"].replace(r'\n', '<br>'), "url":info["webpage_url"]}
-    return render(request, 'YoutubeDownloader/display_video_info.html', content)
+    return render(request, 'Fianl_Downloader/display_video_info.html', content)
 
