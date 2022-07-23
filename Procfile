@@ -1,1 +1,1 @@
-web: nohup supervisord -c ./config/supervisord.conf; bin/start-nginx-solo
+web: bin/start-nginx supervisord -c ./config/supervisord.conf
