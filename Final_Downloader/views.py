@@ -7,7 +7,7 @@ import json
 import requests
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from celery.result import AsyncResult
 import youtube_dl
 
@@ -50,7 +50,7 @@ def delete_file(file_name, start_byte):
         f.truncate()
 
 
-def breakpoint_download(request, user_path, video_id, filename):
+# def breakpoint_download(request, user_path, video_id, filename):
 
     # statobj = os.stat(f"{user_path}/{video_id}/{filename}")
  
@@ -98,12 +98,11 @@ def breakpoint_download(request, user_path, video_id, filename):
     # # 'Cache-Control'控制浏览器缓存行为，此处禁止浏览器缓存，参考：https://blog.csdn.net/cominglately/article/details/77685214
     # response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     # return response
-    response = HttpResponse()
-    response['Content_Type']='application/octet-stream'
-    response["Content-Disposition"] = f"attachment; filename={filename}"
-    response['Content-Length'] = os.path.getsize(f"{user_path}/{video_id}/{filename}")
-    response['X-Accel-Redirect'] = f"/{user_path}/{video_id}/{filename}"
-    return response
+    # response = HttpResponse()
+    # response['Content_Type']='application/octet-stream'
+    # response["Content-Disposition"] = f"attachment; filename={filename}"
+    # response['X-Accel-Redirect'] = 
+    # return response
     
 
 def save_form(form, owner):
@@ -248,8 +247,7 @@ def transmit_file(request, video_id):
                     raise Http404
                 else:
                     pure_file_name = get_pure_filename(info_file, user_path, video_id)
-                    response = breakpoint_download(request, user_path, video_id, pure_file_name)
-                    return response
+                    return HttpResponseRedirect(f"/{user_path}/{video_id}/{pure_file_name}")
 
 @login_required
 def search_video(request, key_word):
