@@ -47,11 +47,16 @@ http {
     
     root /app;
 
+    set $cors_disposition "";
+    set $cors_type "";
  
     if ($request_filename ~* ^.*?\.(mp4|mkv|flv|mp3|webm|m4a)$) {
-      add_header Content-Disposition attachment;
-      add_header Content-Type application/octet-stream;
+      set $cors_disposition attachment;
+      set $cors_type application/octet-stream;
     }
+
+    add_header Content-Disposition $cors_disposition;
+    add_header Content-Type $cors_type;
 
     location / {
       # checks for static file, if not found proxy to app
