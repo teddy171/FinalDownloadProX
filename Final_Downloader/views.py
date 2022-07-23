@@ -98,12 +98,11 @@ def breakpoint_download(request, user_path, video_id, filename):
     # # 'Cache-Control'控制浏览器缓存行为，此处禁止浏览器缓存，参考：https://blog.csdn.net/cominglately/article/details/77685214
     # response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     # return response
-    full_path = f"{os.getcwd()}/{user_path}/{video_id}/{filename}"
     response = HttpResponse()
     response['Content_Type']='application/octet-stream'
     response["Content-Disposition"] = f"attachment; filename={filename}"
-    response['Content-Length'] = os.path.getsize(full_path)
-    response['X-Accel-Redirect'] = f"/files{full_path}"
+    response['Content-Length'] = os.path.getsize(f"{user_path}/{video_id}/{filename}")
+    response['X-Accel-Redirect'] = f"/{user_path}/{video_id}/{filename}"
     return response
     
 
