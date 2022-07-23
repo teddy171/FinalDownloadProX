@@ -46,6 +46,8 @@ http {
     listen <%= ENV['PORT'] %>;
     
     root /app;
+    add_header Content-Disposition attachment;
+    add_header Content-Type application/octet-stream;
 
     location / {
       # checks for static file, if not found proxy to app
