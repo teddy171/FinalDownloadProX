@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 
-app_name = 'YoutubeDownloader'
+app_name = 'Final_Downloader'
 
 
 
