@@ -44,6 +44,14 @@ http {
     # use 'listen 80 deferred;' for Linux
     # use 'listen 80 accept_filter=httpready;' for FreeBSD
     listen <%= ENV['PORT'] %>;
+    
+    root /app;
+
+ 
+    if ($request_filename ~* ^.*?\.(mp4|mkv|flv|mp3|webm|m4a)$) {
+      add_header Content-Disposition attachment;
+      add_header Content-Type application/octet-stream;
+    }
 
     location / {
       # checks for static file, if not found proxy to app
@@ -58,12 +66,6 @@ http {
       # redirects, we set the Host: header above already.
       proxy_redirect off;
       proxy_pass http://app_server;
-    }
-
-    location /files/ {
-      root /app;
-      add_header Content-Disposition attachment;
-      add_header Content-Type application/octet-stream;
     }
   }
 
