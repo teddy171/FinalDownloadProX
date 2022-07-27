@@ -1,6 +1,6 @@
 import os
 import mmap
-import mimetypes
+import aria2p
 import shutil
 import json
 
@@ -123,12 +123,13 @@ def get_download_satus(task_worker_dict, user_path):
                 files.remove(info_file)   
         with open(f"{user_path}/{video_id}/{info_file}") as f:
             info = json.load(f)
+            file_title = info["title"]
             file_sizes = []
             for format in info["formats"]:
                 if format["filesize"] != None:
                     file_sizes.append(format["filesize"])
             file_size = max(file_sizes)
-            yield (status, video_id, file_size, info_file)
+            yield (status, video_id, file_size, info_file, file_title)
 
 @login_required
 def new_task(request):
@@ -204,29 +205,28 @@ def download_status(request):
         tasks_status = list(get_download_satus(task_worker, user_path))
         message = {}
         for task_status in tasks_status:
-            status, video_id, file_size, info_file = task_status
-            files = os.listdir(f"{user_path}/{video_id}")
-            try:
-                files.remove(info_file)
-                files.remove('full_size.json')
-            except ValueError:
-                pass
-
-            try:
-                file_name = files[0]
-            except IndexError:
-                file_name = None
+            status, video_id, file_size, info_file, video_title = task_status
             if status == 'SUCCESS':
-                if file_name:
-                    message[video_id] = {"status": status, "file_name": file_name}
+                message[video_id] = {"status": status, "file_name": video_title}
+
             elif status == "PENDING":
-                if file_name:
-                    file_curr_size = "{:,}".format(os.stat(f"{user_path}/{video_id}/{files[0]}").st_size)
-                else:
+                aria2 = aria2p.API(
+                    aria2p.Client(
+                        host="http://localhost",
+                        port=6800,
+                        secret=""
+                    )
+                )
+
+                downloadings = aria2.get_downloads()
+                file_curr_size = ""
+                for downloading in downloadings:
+                    if downloading.name.count(video_title) > 0:
+                        file_curr_size = "{:,}".format(video_title.progress)
+                if file_curr_size == "":
                     file_curr_size = 0
-                    file_name = "Wait to start download"
                 file_size = "{:,}".format(file_size)
-                message[video_id] = {"status": status, "file_name": file_name, "file_curr_size": file_curr_size, "file_size" :file_size}
+                message[video_id] = {"status": status, "file_name": video_title, "file_curr_size": file_curr_size, "file_size" :file_size}
         message = {"message": message}
         return render(request, 'Final_Downloader/download_status.html', message)
 
@@ -241,7 +241,7 @@ def transmit_file(request, video_id):
     else:
         tasks_status = list(get_download_satus(task_worker, user_path))
         for task_status in tasks_status:
-            status, video_id_tmp, _, info_file = task_status
+            status, video_id_tmp, _, info_file, file_title = task_status
             if video_id == video_id_tmp:
                 if status != 'SUCCESS':
                     raise Http404
