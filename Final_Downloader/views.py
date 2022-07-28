@@ -131,10 +131,10 @@ def download_task(request):
             for task in tasks:
                 origin_file = set(os.listdir(path))
                 download_video_info(str(task), path)
-                curr_file = set(os.listdir())
+                curr_file = set(os.listdir(path))
                 task = download_video.delay(str(task), path)
                 
-                task_status[curr_file-origin_file] = task.id
+                task_status[curr_file-origin_file[0]] = task.id
 
             with open(f"{path}/work.json", 'w') as f:
                 json.dump(task_status, f)
