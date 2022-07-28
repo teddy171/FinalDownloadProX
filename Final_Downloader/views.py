@@ -172,7 +172,7 @@ def download_status(request):
                 file_curr_size = ""
                 for downloading in downloadings:
                     if downloading.name.count(video_title) > 0:
-                        file_curr_size = "{:,}".format(video_title.progress)
+                        file_curr_size = "{:,}".format(downloading.progress)
                 if file_curr_size == "":
                     file_curr_size = 0
                 file_size = "{:,}".format(file_size)
