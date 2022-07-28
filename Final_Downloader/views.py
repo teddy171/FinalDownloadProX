@@ -169,7 +169,7 @@ def download_status(request):
                 while True:
                     try:
                         downloadings = aria2.get_downloads()
-                    except ConnectionError:
+                    except:
                         pass
                     else:
                         break
