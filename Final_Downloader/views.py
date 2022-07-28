@@ -49,6 +49,17 @@ def delete_file(file_name, start_byte):
         f.seek(start_byte, 1)
         f.truncate()
 
+def download_video_info(content, location):
+    ydl_opts = {
+        "writeinfojson": True, 
+        "outtmpl": f"{location}/%(id)s/%(title)s.%(ext)s", 
+        "external_downloader": "aria2c",
+        "external_downloader_args": ["-x 16", "-k 1M", "--enable-rpc"],
+        "skip_download": True
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([content])
+
 def save_form(form, owner):
     if form.is_valid():
         new_task = form.save(commit=False)
@@ -118,17 +129,12 @@ def download_task(request):
                 return redirect('Final_Downloader:new_task')
             task_status = {}
             for task in tasks:
-                origin = set(os.listdir(path))
+                origin_file = set(os.listdir(path))
+                download_video_info(str(task), path)
+                curr_file = set(os.listdir())
                 task = download_video.delay(str(task), path)
-                while True:
-                    try:
-                        final = set(os.listdir(path))
-                        new_file = final.difference(origin).pop()
-                    except KeyError:
-                        pass
-                    else:
-                        break
-                task_status[new_file] = task.id
+                
+                task_status[curr_file-origin_file] = task.id
 
             with open(f"{path}/work.json", 'w') as f:
                 json.dump(task_status, f)
