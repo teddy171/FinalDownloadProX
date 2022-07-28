@@ -166,7 +166,13 @@ def download_status(request):
                     )
                 )
 
-                downloadings = aria2.get_downloads()
+                while True:
+                    try:
+                        downloadings = aria2.get_downloads()
+                    except ConnectionError:
+                        pass
+                    else:
+                        break
                 file_curr_size = ""
                 for downloading in downloadings:
                     if downloading.name.count(video_title) > 0:
