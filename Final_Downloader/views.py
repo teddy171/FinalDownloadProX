@@ -1,5 +1,4 @@
 import os
-import mmap
 import aria2p
 import shutil
 import json
@@ -17,7 +16,6 @@ from .models import Task
 from .forms import TaskForm
 
 def clean_data(user):
-
     try:
         shutil.rmtree(f"data/{user}/")
     except:
@@ -39,15 +37,6 @@ def get_pure_filename(info_file, user_path, video_id):
     except ValueError:
         pass
     return files[0]
-
-
-def delete_file(file_name, start_byte):
-    with open(file_name, 'rb+') as f:
-        m = mmap.mmap(f.fileno(), 0)
-        new = m[start_byte:]
-        f.write(new)
-        f.seek(start_byte, 1)
-        f.truncate()
 
 def download_video_info(content, location):
     ydl_opts = {
