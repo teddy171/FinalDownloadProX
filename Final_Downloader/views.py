@@ -2,6 +2,7 @@ import os
 import aria2p
 import shutil
 import json
+from urllib.parse import urlparse
 
 import requests
 from django.shortcuts import render, redirect
@@ -12,7 +13,7 @@ import youtube_dl
 
 from Final_Downloader.tasks import download_video
 
-from .models import Task
+from .models import Task, Process
 from .forms import TaskForm
 
 def clean_data(user):
@@ -84,17 +85,15 @@ def new_task(request):
         form = TaskForm(data=request.POST)
         if form.is_valid():
             content = form.cleaned_data["content"]
-            try:
-                r = requests.get(content)
-            except requests.exceptions.MissingSchema:
-                return redirect("Final_Downloader:search_video", key_word=content)
-            else:
+            if urlparse(content).scheme == ("http" or "https"):
                 same_task = Task.objects.filter(content=content, owner=request.user)
-                if same_task or not(r.ok):
+                if same_task:
                     return redirect('Final_Downloader:new_task')
                 else:
                     save_form(form, request.user)
                     return redirect('Final_Downloader:download_task')
+            else:
+                return redirect("Final_Downloader:search_video", key_word=content)
                     
 
     #Display a blank or invalid form.
