@@ -9,3 +9,13 @@ class Task(models.Model):
     def __str__(self) -> str:
         """Return a string representation of the model.""" 
         return self.content
+
+class Process(models.Model):
+    task_id = models.TextField()
+    video_name = models.TextField()
+    video_size = models.IntegerField()
+
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    def __str__(self) -> str:
+        """Return a string representation of the model.""" 
+        return self.task_id

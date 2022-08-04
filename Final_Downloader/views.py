@@ -6,7 +6,7 @@ import json
 import requests
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from celery.result import AsyncResult
 import youtube_dl
 
@@ -210,8 +210,11 @@ def search_video(request, key_word):
 @login_required
 def display_video_info(request, video_id):
     user_path = f"data/{request.user}"
-    with open(f"{user_path}/search/{video_id}.info.json") as f:
-        info = json.load(f)
+    try:
+        with open(f"{user_path}/search/{video_id}.info.json") as f:
+            info = json.load(f)
+    except FileNotFoundError:
+        raise Http404
     content = {"title": info["title"], "description": info["description"].replace(r'\n', '<br>'), "url":info["webpage_url"]}
     return render(request, 'Final_Downloader/display_video_info.html', content)
 
