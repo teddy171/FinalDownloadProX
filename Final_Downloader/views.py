@@ -42,7 +42,7 @@ def get_pure_filename(info_file, user_path, video_id):
 def download_video_info(content, location):
     ydl_opts = {
         "writeinfojson": True, 
-        "outtmpl": f"{location}/%(id)s/%(title)s.%(ext)s", 
+        "outtmpl": f"{location}/info/", 
         "skip_download": True
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -110,20 +110,24 @@ def download_task(request):
         whether_add = request.POST.get('whether_add', None)
         if whether_donwload:
             tasks = Task.objects.filter(owner=request.user)
-            path = clean_data(request.user)
+            user_path = clean_data(request.user)
             if len(tasks) == 0:
                 return redirect('Final_Downloader:new_task')
-            task_status = {}
             for task in tasks:
-                origin_file = set(os.listdir(path))
-                download_video_info(str(task), path)
-                curr_file = set(os.listdir(path))
-                task = download_video.delay(str(task), path)
-                
-                task_status[list(curr_file-origin_file)[0]] = task.id
+                download_video_info(str(task), user_path)
+                with open(f"{user_path}/.info.json") as f:
+                    info = json.load(f)
+                    video_id = info["id"]
+                    video_name = info["title"]
+                    video_size = max([format["filesize"] for format in info["formats"] if format["filesize"]])
+                task = download_video.delay(str(task), user_path)
+                Process.objects.create(
+                    task_id=task.id,
+                    video_id=video_id,
+                    video_name=video_name,
+                    video_size=video_size
+                )
 
-            with open(f"{path}/work.json", 'w') as f:
-                json.dump(task_status, f)
             tasks.delete()
             return redirect('Final_Downloader:download_status')
         elif whether_add:

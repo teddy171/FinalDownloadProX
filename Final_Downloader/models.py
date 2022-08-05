@@ -12,6 +12,7 @@ class Task(models.Model):
 
 class Process(models.Model):
     task_id = models.TextField()
+    video_id = models.TextField()
     video_name = models.TextField()
     video_size = models.IntegerField()
 
