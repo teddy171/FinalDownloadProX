@@ -28,7 +28,6 @@ def clean_data(user):
         os.mkdir(f"data/{user}/search/")
     return f"data/{user}"
 
-
 def get_pure_filename(info_file, user_path, video_id):
     files = os.listdir(f"{user_path}/{video_id}")
     try:
