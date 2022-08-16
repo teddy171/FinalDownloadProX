@@ -1,5 +1,5 @@
 import os
-import aria2p
+#import aria2p
 import shutil
 import json
 from urllib.parse import urlparse
