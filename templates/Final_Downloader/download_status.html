@@ -13,8 +13,8 @@
             {% if video_info.status == 'PENDING' %}
                 <li>
                     <table>
-                        <tr><td>&nbsp;{{ video_info.file_name }}</td></tr>
-                        {% for file_name, file_curr_size in video_info.file_curr_sizes.items %}
+                        <tr><td>{{ video_info.file_name }}&nbsp;-&nbsp;{{ video_info.file_size }}</td></tr>
+                        {% for file_name, file_curr_size in video_info.files_curr_sizes.items %}
                             <tr><td>{{ file_name }}: {{ file_curr_size }}</td></tr>
                         {% endfor %}
                     </table>

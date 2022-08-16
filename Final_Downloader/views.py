@@ -140,20 +140,20 @@ def download_status(request):
             # for downloading in downloadings:
             #     if downloading.name.count(process.video_name) > 0:
             #         file_curr_size = "{:,}".format(downloading.progress)
-            file_curr_sizes = dict()
+            files_curr_sizes = dict()
 
             try:
                 files = os.listdir(f"{user_path}/{process.video_id}")
             except FileNotFoundError:
-                file_curr_sizes = 0
+                files_curr_sizes = 0
             else:
                 for file in files:
-                    file_curr_sizes[file] = "{:,}".format(os.path.getsize(f"{user_path}/{process.video_id}/{file}"))
+                    files_curr_sizes[file] = "{:,}".format(os.path.getsize(f"{user_path}/{process.video_id}/{file}"))
 
             message[process.video_id] = {
                 "status": status,
                 "file_name": process.video_name,
-                "file_curr_sizes": file_curr_sizes,
+                "files_curr_sizes": files_curr_sizes,
                 "file_size": f"{process.video_size:,}"
             }
     message = {"message": message}
