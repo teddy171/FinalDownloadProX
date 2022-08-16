@@ -61,7 +61,7 @@ def new_task(request):
         form = TaskForm(data=request.POST)
         if form.is_valid():
             content = form.cleaned_data["content"]
-            if urlparse(content).scheme == ("http" or "https"):
+            if urlparse(content).scheme == "http" or urlparse(content).scheme == "https":
                 same_task = Task.objects.filter(content=content, owner=request.user)
                 if same_task:
                     return redirect('Final_Downloader:new_task')
@@ -91,17 +91,19 @@ def download_task(request):
                 return redirect('Final_Downloader:new_task')
             for task in tasks:
                 download_video_info(str(task), user_path)
-                with open(f"{user_path}/.info.json") as f:
+                with open(f"{user_path}/info/.info.json") as f:
                     info = json.load(f)
                     video_id = info["id"]
                     video_name = info["title"]
                     video_size = max([format["filesize"] for format in info["formats"] if format["filesize"]])
+                shutil.rmtree(f"{user_path}/info/")
                 task = download_video.delay(str(task), user_path)
                 Process.objects.create(
                     task_id=task.id,
                     video_id=video_id,
                     video_name=video_name,
-                    video_size=video_size
+                    video_size=video_size,
+                    owner=request.user
                 )
 
             tasks.delete()
@@ -112,13 +114,13 @@ def download_task(request):
 @login_required
 def download_status(request):
     user_path = f"data/{request.user}"
-    aria2 = aria2p.API(
-        aria2p.Client(
-            host="http://localhost",
-            port=6800,
-            secret=""
-        )
-    )
+    # aria2 = aria2p.API(
+    #     aria2p.Client(
+    #         host="http://localhost",
+    #         port=6800,
+    #         secret=""
+    #     )
+    # )
 
     processes = get_list_or_404(Process, owner=request.user)
 
@@ -131,16 +133,25 @@ def download_status(request):
             message[process.video_id] = {"status": status, "file_name": process.video_name}
 
         elif status == "PENDING":
-            downloadings = aria2.get_downloads()
-            file_curr_size = ""
-            for downloading in downloadings:
-                if downloading.name.count(process.video_name) > 0:
-                    file_curr_size = "{:,}".format(downloading.progress)
-            
+            # downloadings = aria2.get_downloads()
+            # file_curr_size = ""
+            # for downloading in downloadings:
+            #     if downloading.name.count(process.video_name) > 0:
+            #         file_curr_size = "{:,}".format(downloading.progress)
+            file_curr_size = dict()
+
+            try:
+                files = os.listdir(f"{user_path}/{process.video_id}")
+            except FileNotFoundError:
+                file_curr_size = 0
+            else:
+                for file in files:
+                    file_curr_size[file] = "{:,}".format(os.path.getsize(f"{user_path}/{process.video_id}/{file}"))
+
             message[process.video_id] = {
                 "status": status,
                 "file_name": process.video_name,
-                "file_curr_size": file_curr_size,
+                "file_curr_size": str(file_curr_size),
                 "file_size": f"{process.video_size:,}"
             }
     message = {"message": message}
@@ -181,6 +192,9 @@ def display_video_info(request, video_id):
             info = json.load(f)
     except FileNotFoundError:
         raise Http404
-    content = {"title": info["title"], "description": info["description"].replace(r'\n', '<br>'), "url":info["webpage_url"]}
+    content = {
+        "title": info["title"],
+        "description": info["description"].replace(r'\n', '<br>'),
+        "url":info["webpage_url"]
+    }
     return render(request, 'Final_Downloader/display_video_info.html', content)
-
