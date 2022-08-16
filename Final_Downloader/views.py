@@ -16,6 +16,8 @@ from .models import Task, Process
 from .forms import TaskForm
 
 def clean_data(user):
+    Process.objects.filter(owner=user).delete()
+
     try:
         shutil.rmtree(f"data/{user}/")
     except:
@@ -138,20 +140,20 @@ def download_status(request):
             # for downloading in downloadings:
             #     if downloading.name.count(process.video_name) > 0:
             #         file_curr_size = "{:,}".format(downloading.progress)
-            file_curr_size = dict()
+            file_curr_sizes = dict()
 
             try:
                 files = os.listdir(f"{user_path}/{process.video_id}")
             except FileNotFoundError:
-                file_curr_size = 0
+                file_curr_sizes = 0
             else:
                 for file in files:
-                    file_curr_size[file] = "{:,}".format(os.path.getsize(f"{user_path}/{process.video_id}/{file}"))
+                    file_curr_sizes[file] = "{:,}".format(os.path.getsize(f"{user_path}/{process.video_id}/{file}"))
 
             message[process.video_id] = {
                 "status": status,
                 "file_name": process.video_name,
-                "file_curr_size": str(file_curr_size),
+                "file_curr_sizes": file_curr_sizes,
                 "file_size": f"{process.video_size:,}"
             }
     message = {"message": message}
