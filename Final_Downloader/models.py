@@ -11,6 +11,7 @@ class Task(models.Model):
         return self.content
 
 class Process(models.Model):
+    '''存储正在下载的视频信息'''
     task_id = models.TextField()
     video_id = models.TextField()
     video_name = models.TextField()
@@ -20,3 +21,9 @@ class Process(models.Model):
     def __str__(self) -> str:
         """Return a string representation of the model.""" 
         return self.task_id
+
+class SearchResult(models.Model):
+    video_id = models.TextField()
+    video_title = models.TextField()
+    video_description = models.TextField()
+    video_url = models.TextField()
