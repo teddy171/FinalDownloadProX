@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Final_Downloader', '0004_searchresult_owner_alter_process_video_size'),
+        ('Final_Downloader', '0004_searchresult_owner'),
     ]
 
     operations = [
