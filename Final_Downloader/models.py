@@ -27,5 +27,6 @@ class SearchResult(models.Model):
     video_title = models.TextField()
     video_description = models.TextField()
     video_url = models.TextField()
+    video_author = models.TextField()
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
