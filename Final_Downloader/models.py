@@ -15,7 +15,7 @@ class Process(models.Model):
     task_id = models.TextField()
     video_id = models.TextField()
     video_name = models.TextField()
-    #video_size = models.BigIntegerField()
+    video_size = models.BigIntegerField()
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     def __str__(self) -> str:
