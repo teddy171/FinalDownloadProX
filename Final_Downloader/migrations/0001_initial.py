@@ -41,6 +41,7 @@ class Migration(migrations.Migration):
                 ('task_id', models.TextField()),
                 ('video_id', models.TextField()),
                 ('video_name', models.TextField()),
+                ('video_size', models.IntegerField()),
                 ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
