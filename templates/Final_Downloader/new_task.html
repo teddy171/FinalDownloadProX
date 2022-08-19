@@ -9,14 +9,13 @@
         <strong>ENJOY YOURSELF</strong>
     </p>
     <form action="{% url 'Final_Downloader:new_task' %}" method='post'>
-        <div class="Wrapper">
-            <div class="Input">
-                {% csrf_token %}
-                <input type="text" id="input" name="content" class="Input-text" placeholder="url or keyword">
-                <label for="input" class="Input-label">video url or keyword</label>
-            </div>
-            <button name="submit">search or download</button>
+        <div class="Input">
+            {% csrf_token %}
+            <input type="text" id="input" name="content"  autocomplete="off" class="Input-text" placeholder="url or keyword">
+            <label for="input" class="Input-label">video url or keyword</label>
         </div>
+
+        <button name="submit">search or download</button>
     </form>
 
 {% endblock content %}
