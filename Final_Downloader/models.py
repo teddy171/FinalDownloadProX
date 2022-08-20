@@ -22,11 +22,11 @@ class Process(models.Model):
         """Return a string representation of the model.""" 
         return self.task_id
 
-# class SearchResult(models.Model):
-#     video_id = models.TextField()
-#     video_title = models.TextField()
-#     video_description = models.TextField()
-#     video_url = models.TextField()
-#     video_author = models.TextField()
+class SearchResult(models.Model):
+    video_id = models.TextField()
+    video_title = models.TextField()
+    video_description = models.TextField()
+    video_url = models.TextField()
+    video_author = models.TextField()
 
-#     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
