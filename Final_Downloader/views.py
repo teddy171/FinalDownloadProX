@@ -12,7 +12,7 @@ import youtube_dl
 
 from Final_Downloader.tasks import download_video
 
-from .models import Task, Process, SearchResult
+from .models import Task, Process
 from .forms import TaskForm
 
 def clean_data(user):
@@ -171,40 +171,40 @@ def transmit_file(request, video_id):
         pure_file_name = get_pure_filename(user_path, video_id)
         return HttpResponseRedirect(f"/{user_path}/{video_id}/{pure_file_name}")
 
-@login_required
-def search_video(request, key_word):
-    user_path = f"data/{request.user}"
-    ydl_opts = {"skip_download": True,"writeinfojson": True, "default_search": "ytsearch10", "outtmpl": f"{user_path}/search/%(id)s"}
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([key_word])
-    files = os.listdir(f"{user_path}/search/")
-    titles = dict()
-    for file in files[:20]:
-        with open(f"{user_path}/search/{file}") as f:
-            info = json.load(f)
-    #        titles[info["id"]] = info["title"]
+# @login_required
+# def search_video(request, key_word):
+#     user_path = f"data/{request.user}"
+#     ydl_opts = {"skip_download": True,"writeinfojson": True, "default_search": "ytsearch10", "outtmpl": f"{user_path}/search/%(id)s"}
+#     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+#         ydl.download([key_word])
+#     files = os.listdir(f"{user_path}/search/")
+#     titles = dict()
+#     for file in files[:20]:
+#         with open(f"{user_path}/search/{file}") as f:
+#             info = json.load(f)
+#     #        titles[info["id"]] = info["title"]
 
-        SearchResult.objects.create(
-            video_id = info["id"],
-            video_title = info["title"],
-            video_description = info["description"].replace(r'\n', '<br>'),
-            video_url = info["webpage_url"],
-            owner = request.user,
-        )
+#         SearchResult.objects.create(
+#             video_id = info["id"],
+#             video_title = info["title"],
+#             video_description = info["description"].replace(r'\n', '<br>'),
+#             video_url = info["webpage_url"],
+#             owner = request.user,
+#         )
 
-    searchresults = get_list_or_404(SearchResult, owner=request.user)
-    for searchresult in searchresults:
-        titles[searchresult.video_id] = searchresult.video_title
-    content = {"titles": titles}
-    return render(request, 'Final_Downloader/search_video.html', content)
+#     searchresults = get_list_or_404(SearchResult, owner=request.user)
+#     for searchresult in searchresults:
+#         titles[searchresult.video_id] = searchresult.video_title
+#     content = {"titles": titles}
+#     return render(request, 'Final_Downloader/search_video.html', content)
 
-@login_required
-def display_video_info(request, video_id):
-    searchresult = get_object_or_404(SearchResult, owner=request.user, video_id=video_id)
+# @login_required
+# def display_video_info(request, video_id):
+#     searchresult = get_object_or_404(SearchResult, owner=request.user, video_id=video_id)
     
-    content = {
-        "title": searchresult.video_title,
-        "description": searchresult.video_description.replace(r'\n', '<br>'),
-        "url": searchresult.video_url
-    }
-    return render(request, 'Final_Downloader/display_video_info.html', content)
+#     content = {
+#         "title": searchresult.video_title,
+#         "description": searchresult.video_description.replace(r'\n', '<br>'),
+#         "url": searchresult.video_url
+#     }
+#     return render(request, 'Final_Downloader/display_video_info.html', content)
