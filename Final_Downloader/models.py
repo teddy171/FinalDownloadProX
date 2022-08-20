@@ -30,3 +30,5 @@ class SearchResult(models.Model):
     video_author = models.TextField()
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    def __str__(self) -> str:
+        return self.video_title
