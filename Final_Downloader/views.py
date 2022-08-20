@@ -32,7 +32,7 @@ def clean_data(user):
 
 def get_pure_filename(user_path, video_id):
     files = os.listdir(f"{user_path}/{video_id}")
-    if len(files != 1):
+    if len(files) != 1:
         raise ValueError(f"More than a file {files}")
     else:
         return files[0]
