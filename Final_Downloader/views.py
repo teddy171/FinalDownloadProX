@@ -12,7 +12,7 @@ import youtube_dl
 
 from Final_Downloader.tasks import download_video
 
-from .models import Task, Process
+from .models import Task, Process, SearchResult
 from .forms import TaskForm
 
 def clean_data(user):
@@ -182,21 +182,29 @@ def search_video(request, key_word):
     for file in files[:20]:
         with open(f"{user_path}/search/{file}") as f:
             info = json.load(f)
-            titles[info["id"]] = info["title"]
+    #        titles[info["id"]] = info["title"]
+
+        SearchResult.objects.create(
+            video_id = info["id"],
+            video_title = info["title"],
+            video_description = info["description"].replace(r'\n', '<br>'),
+            video_url = info["webpage_url"],
+            owner = request.user,
+        )
+
+    searchresults = get_list_or_404(SearchResult, owner=request.user)
+    for searchresult in searchresults:
+        titles[searchresult.video_id] = searchresult.video_title
     content = {"titles": titles}
     return render(request, 'Final_Downloader/search_video.html', content)
 
 @login_required
 def display_video_info(request, video_id):
-    user_path = f"data/{request.user}"
-    try:
-        with open(f"{user_path}/search/{video_id}.info.json") as f:
-            info = json.load(f)
-    except FileNotFoundError:
-        raise Http404
+    searchresult = get_object_or_404(SearchResult, owner=request.user, video_id=video_id)
+    
     content = {
-        "title": info["title"],
-        "description": info["description"].replace(r'\n', '<br>'),
-        "url":info["webpage_url"]
+        "title": searchresult.video_title,
+        "description": searchresult.video_description.replace(r'\n', '<br>'),
+        "url": searchresult.video_url
     }
     return render(request, 'Final_Downloader/display_video_info.html', content)
