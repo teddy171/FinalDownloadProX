@@ -174,15 +174,17 @@ def transmit_file(request, video_id):
 @login_required
 def search_video(request, key_word):
     user_path = f"data/{request.user}"
+
+    SearchResult.objects.filter(owner=request.user).delete()
+
     ydl_opts = {"skip_download": True,"writeinfojson": True, "default_search": "ytsearch10", "outtmpl": f"{user_path}/search/%(id)s"}
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([key_word])
     files = os.listdir(f"{user_path}/search/")
-    titles = dict()
-    for file in files[:20]:
+
+    for file in files:
         with open(f"{user_path}/search/{file}") as f:
             info = json.load(f)
-    #        titles[info["id"]] = info["title"]
 
         SearchResult.objects.create(
             video_id = info["id"],
@@ -192,6 +194,7 @@ def search_video(request, key_word):
             owner = request.user,
         )
 
+    titles = dict()
     searchresults = get_list_or_404(SearchResult, owner=request.user)
     for searchresult in searchresults:
         titles[searchresult.video_id] = searchresult.video_title
