@@ -1,4 +1,4 @@
-gitimport os
+import os
 #import aria2p
 import shutil
 import json
