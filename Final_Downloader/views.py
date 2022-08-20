@@ -193,6 +193,9 @@ def search_video(request, key_word):
             video_url = info["webpage_url"],
             owner = request.user,
         )
+    
+    shutil.rmtree(f"{user_path}/search")
+    os.mkdir(f"{user_path}/search")
 
     titles = dict()
     searchresults = get_list_or_404(SearchResult, owner=request.user)
