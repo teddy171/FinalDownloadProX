@@ -84,9 +84,7 @@ def download_task(request):
     if request.method != 'POST':
         return render(request, 'Final_Downloader/download_video.html')
     else:
-        whether_donwload = request.POST.get('whether_donwload', None)
-        whether_add = request.POST.get('whether_add', None)
-        if whether_donwload:
+        if 'whether_donwload' in request.POST:
             tasks = Task.objects.filter(owner=request.user)
             user_path = clean_data(request.user)
             if len(tasks) == 0:
@@ -110,7 +108,7 @@ def download_task(request):
 
             tasks.delete()
             return redirect('Final_Downloader:download_status')
-        elif whether_add:
+        elif 'whether_add' in request.POST:
             return redirect('Final_Downloader:new_task')
 
 @login_required
