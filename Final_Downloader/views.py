@@ -2,7 +2,7 @@ import os
 #import aria2p
 import shutil
 import json
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 
 from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -167,7 +167,7 @@ def transmit_file(request, video_id):
         raise Http404
     else:
         pure_file_name = get_pure_filename(user_path, video_id)
-        return HttpResponseRedirect(f"/{user_path}/{video_id}/{pure_file_name}")
+        return HttpResponseRedirect(f"/{user_path}/{video_id}/{quote(pure_file_name)}")
 
 @login_required
 def search_video(request, key_word):
