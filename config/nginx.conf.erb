@@ -43,7 +43,7 @@ http {
   server {
     # use 'listen 80 deferred;' for Linux
     # use 'listen 80 accept_filter=httpready;' for FreeBSD
-    listen <%= ENV['PORT'] %>;
+    listen 80;
     
     root /app;
 
