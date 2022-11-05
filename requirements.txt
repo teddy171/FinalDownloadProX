@@ -13,7 +13,6 @@ click-repl==0.2.0
 Deprecated==1.2.13
 dj-database-url==0.5.0
 Django==4.0.5
-django-heroku==0.3.1
 dnspython==2.2.1
 eventlet==0.33.1
 greenlet==1.1.2
