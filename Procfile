@@ -1,1 +1,0 @@
-web: supervisord -c ./config/supervisord.conf; bin/start-nginx-solo
