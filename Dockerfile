@@ -1,9 +1,9 @@
 FROM debian:bullseye
 
 RUN apt-get update
-RUN apt-get install -y python3 python3-pip nginx sudo
+RUN apt-get install -y python3 python3-pip nginx
 
-RUN mkdir /usr/FinalDownloadProX -p
+RUN mkdir /usr/FinalDownloadProX
 COPY . /usr/FinalDownloadProX
 COPY ./config/nginx.conf /etc/nginx/nginx.conf
 WORKDIR /usr/FinalDownloadProX
