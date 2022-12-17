@@ -12,4 +12,4 @@ RUN pip3 install -r requirements.txt
 RUN python3 manage.py makemigrations
 RUN python3 manage.py migrate
 
-CMD "nginx & supervisord -c ./config/supervisord.conf"
+CMD "nginx & supervisord -c /usr/src/FinalDownloadProX/config/supervisord.conf"
