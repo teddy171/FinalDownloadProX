@@ -5,7 +5,7 @@ RUN apt-get install -y python3 python3-pip nginx sudo
 
 RUN mkdir /usr/FinalDownloadProX -p
 COPY . /usr/src/FinalDownloadProX
-COPY /usr/src/FinalDownloadProX/config/nginx.conf /etc/nginx/nginx.conf
+COPY ./config/nginx.conf /etc/nginx/nginx.conf
 WORKDIR /usr/src/FinalDownloadProX
 
 RUN pip3 install -r requirements.txt
