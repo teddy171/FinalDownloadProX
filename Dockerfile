@@ -8,6 +8,7 @@ COPY . /usr/FinalDownloadProX
 COPY ./config/nginx.conf /etc/nginx/nginx.conf
 WORKDIR /usr/FinalDownloadProX
 
+RUN /usr/FinalDownloadProX/config/
 RUN pip3 install -r requirements.txt
 RUN python3 manage.py makemigrations
 RUN python3 manage.py migrate
