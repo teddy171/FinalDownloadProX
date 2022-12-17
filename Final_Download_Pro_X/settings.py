@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-j!7b)mt4zqqx2ymz%dw(m-k=7pprle1j)36ngm@2$fck-u=w6j
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://finaldownloadprox-production.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://final-download-pro-x.up.railway.app']
 
 
 # Application definition
