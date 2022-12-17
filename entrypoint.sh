@@ -1,2 +1,2 @@
 nginx
-supervisord -c /config/supervisord.conf
+supervisord -c config/supervisord.conf
