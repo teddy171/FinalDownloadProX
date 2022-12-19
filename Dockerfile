@@ -1,7 +1,7 @@
 FROM debian:bullseye
 
 RUN apt-get update
-RUN apt-get install -y python3 python3-pip nginx redis
+RUN apt-get install -y python3 python3-pip nginx redis ffmpeg
 
 RUN mkdir /usr/local/src/FinalDownloadProX
 ADD . /usr/local/src/FinalDownloadProX
