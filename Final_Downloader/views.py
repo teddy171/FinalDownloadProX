@@ -132,7 +132,7 @@ def download_status(request):
         if status == 'SUCCESS':
             message[process.video_id] = {"status": status, "file_name": process.video_name}
 
-        elif status == "PENDING":
+        elif status == "STARTED" or status == "PENDING":
             # downloadings = aria2.get_downloads()
             # file_curr_size = ""
             # for downloading in downloadings:
