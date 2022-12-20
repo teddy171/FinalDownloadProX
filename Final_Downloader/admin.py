@@ -23,6 +23,6 @@ class SearchResultAdmin(admin.ModelAdmin):
 
     list_filter = ('video_title', 'video_id', 'video_url', 'video_author')
 
-admin.site.register(Task)
-admin.site.register(Process)
-admin.site.register(SearchResult)
+admin.site.register(Task, TaskAdmin)
+admin.site.register(Process, ProcessAdmin)
+admin.site.register(SearchResult, SearchResultAdmin)
