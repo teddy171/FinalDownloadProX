@@ -10,7 +10,7 @@
     </script>
     <ul>
         {% for video_id, video_info in message.items %}
-            {% if video_info.status == 'PENDING' %}
+            {% if video_info.status == 'PENDING' or video_info.status == 'STARTED'%}
                 <li>
                     <table>
                         <tr>|--{{ video_info.file_name }}&nbsp;-&nbsp;{{ video_info.file_size }}</tr>
@@ -23,6 +23,8 @@
 
             {% elif video_info.status == 'SUCCESS' %}
                 <li><p>{{ video_info.file_name }} is donwloaded sucessfully.<br>You can download <a href="{% url 'Final_Downloader:transmit_task' video_id %}" target="_blank">here.</a></p></li>
+            {% elif video_info.status == 'FAILURE' or video_info.status == 'RETRY' %}
+                <li><p>{{ video_info.file_name }} failed to download. Start retrying.</p></li>
             {% endif %}
             <p><br></p>
         {% endfor %}
